@@ -846,10 +846,7 @@ A list of modules can also be specified as an array.
     At least Julia 1.4 is required for specifying a module.
 """
 function methods(@nospecialize(f), @nospecialize(t),
-                 @nospecialize(mod::Union{Module,AbstractArray{Module},Nothing}=nothing))
-    if mod isa Module
-        mod = (mod,)
-    end
+                 @nospecialize(mod::Union{Tuple{Module},AbstractArray{Module},Nothing}=nothing))
     if isa(f, Core.Builtin)
         throw(ArgumentError("argument is not a generic function"))
     end
@@ -858,6 +855,7 @@ function methods(@nospecialize(f), @nospecialize(t),
     MethodList(Method[m.method for m in _methods(f, t, -1, world) if mod === nothing || m.method.module in mod],
                typeof(f).name.mt)
 end
+methods(@nospecialize(f), @nospecialize(t), mod::Module) = methods(f, t, (mod,))
 
 methods(f::Core.Builtin) = MethodList(Method[], typeof(f).name.mt)
 
